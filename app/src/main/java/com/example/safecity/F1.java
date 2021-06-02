@@ -1,5 +1,6 @@
 package com.example.safecity;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -23,7 +24,9 @@ public class F1 extends Fragment {
         agreeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setFragment(new F2());
+                Intent i = new Intent(getActivity(), VerificationActivity.class);
+                startActivity(i);
+                getActivity().finish();
             }
         });
         return v;

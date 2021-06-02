@@ -56,24 +56,11 @@ public class SOSActivity extends AppCompatActivity {
     private TextView playSiren;
     private TextView stopSiren;
 
-    private SensorManager mSensorManager;
-    private float mAccel;
-    private float mAccelCurrent;
-    private float mAccelLast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_s_o_s);
-
-        Intent intent = new Intent(this, ShakeService.class);
-        startService(intent);
-
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        Objects.requireNonNull(mSensorManager).registerListener(mSensorListener, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
-        mAccel = 10f;
-        mAccelCurrent = SensorManager.GRAVITY_EARTH;
-        mAccelLast = SensorManager.GRAVITY_EARTH;
 
         sosEmer1 = findViewById(R.id.sosEmer1);
         sosEmer2 = findViewById(R.id.sosEmer2);
@@ -126,27 +113,7 @@ public class SOSActivity extends AppCompatActivity {
         });
     }
 
-    private final SensorEventListener mSensorListener = new SensorEventListener() {
-        @Override
-        public void onSensorChanged(SensorEvent event) {
-            float x = event.values[0];
-            float y = event.values[1];
-            float z = event.values[2];
-            mAccelLast = mAccelCurrent;
-            mAccelCurrent = (float) Math.sqrt((double) (x * x + y * y + z * z));
-            float delta = mAccelCurrent - mAccelLast;
-            mAccel = mAccel * 0.9f + delta;
-            if (mAccel > 20) {
-                Toast.makeText(getApplicationContext(), "Shake Detected!", Toast.LENGTH_SHORT).show();
-                getLastLocation();
-                sendSMS();
-            }
-        }
 
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        }
-    };
 
     public void sendSMS() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
@@ -159,26 +126,12 @@ public class SOSActivity extends AppCompatActivity {
                 smsManager.sendTextMessage(sosEmer1.getText().toString(), null, "SOS: I need your help! My current location is: " + currentLocation, null, null);
                 smsManager.sendTextMessage(sosEmer2.getText().toString(), null, "SOS: I need your help! My current location is: " + currentLocation, null, null);
                 smsManager.sendTextMessage(sosEmer3.getText().toString(), null, "SOS: I need your help! My current location is: " + currentLocation, null, null);
-                smsManager.sendTextMessage("+919326053407", null, "SOS: I need your help! My current location is: " + currentLocation, null, null);
+                smsManager.sendTextMessage("+918861640061", null, "SOS: I need your help! My current location is: " + currentLocation, null, null);
                 Toast.makeText(this, "Message Sent!", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    @Override
-    protected void onResume() {
-        mSensorManager.registerListener(mSensorListener, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
-        if (checkPermissions()) {
-            getLastLocation();
-        }
-        super.onResume();
-    }
-
-    @Override
-    protected void onPause() {
-        mSensorManager.unregisterListener(mSensorListener);
-        super.onPause();
-    }
 
     private void getLastLocation() {
         if (checkPermissions()) {
